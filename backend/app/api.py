@@ -28,8 +28,8 @@ app.add_middleware(
 db: PooledMySQLConnection | MySQLConnection | Any = get_db()
 
 
-@app.post(path="/register", tags=["users"], status_code=201)
-async def register_user(user: Dict[str, str]) -> None:
+@app.post(path="/checkregister", tags=["users"], status_code=200)
+async def check_register_user(user: Dict[str, str]) -> None:
     if (not user["email"]) and (not user["mobile"]):
         raise HTTPException(
             status_code=400, detail="Email or Mobile is required.")
@@ -60,14 +60,22 @@ async def register_user(user: Dict[str, str]) -> None:
     if cursor.fetchone():
         raise HTTPException(
             status_code=409, detail="This username isn't available. Please try another.")
-    params: Tuple[str, str, str, str, str] = (
-        user["mobile"],
-        user["email"],
+
+
+@app.post(path="/register", tags=["users"], status_code=201)
+async def register_user(user: Dict[str, str]) -> None:
+    cursor: MySQLCursor = db.cursor()
+    mobile = user["mobile"] or None
+    email = user["email"] or None
+    params: Tuple[str, str, str, str, str, str] = (
+        mobile,
+        email,
         user["fullName"],
         user["username"],
         user["password"],
+        user["birthday"]
     )
-    operation = "INSERT INTO user (mobile, email, fullName, username, password) VALUES (%s, %s, %s, %s, %s)"
+    operation = "INSERT INTO user (mobile, email, fullName, username, password, birthday) VALUES (%s, %s, %s, %s, %s, %s)"
     cursor.execute(operation, params)
     db.commit()
 
