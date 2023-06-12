@@ -1,8 +1,8 @@
 import { ChakraProvider } from "@chakra-ui/react";
-import React from "react";
+import { ReactElement } from "react";
 import Login from "./components/login";
 
-function Home(): React.ReactElement {
+function Home(): ReactElement {
   return (
     <ChakraProvider>
       <Login />

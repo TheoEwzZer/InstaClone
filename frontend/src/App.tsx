@@ -1,9 +1,9 @@
-import React from "react";
+import { ReactElement } from "react";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import Home from "./pages/home";
 import Register from "./pages/register";
 
-function App(): React.ReactElement {
+function App(): ReactElement {
   return (
     <Router>
       <Routes>

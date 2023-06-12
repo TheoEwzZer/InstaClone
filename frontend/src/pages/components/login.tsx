@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import { ChangeEvent, ReactElement, useState } from "react";
 
 import {
   Box,
@@ -30,7 +30,7 @@ function isPhoneNumberOrEmailOrUsername(input: string): string {
   return "username";
 }
 
-function Login(): React.ReactElement {
+function Login(): ReactElement {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isInputEmpty, setIsInputEmpty] = useState<boolean>(true);
   const [mobileOrEmailOrUsername, setMobileOrEmailOrUsername] =
@@ -42,8 +42,8 @@ function Login(): React.ReactElement {
     onToggle();
   };
 
-  const changePassword: (event: React.ChangeEvent<HTMLInputElement>) => void = (
-    event: React.ChangeEvent<HTMLInputElement>
+  const changePassword: (event: ChangeEvent<HTMLInputElement>) => void = (
+    event: ChangeEvent<HTMLInputElement>
   ): void => {
     setIsInputEmpty(event.target.value === "");
     setPassword(event.target.value);

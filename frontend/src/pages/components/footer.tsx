@@ -1,4 +1,4 @@
-import React from "react";
+import { ReactElement } from "react";
 import { Button, Wrap } from "@chakra-ui/react";
 
 interface ButtonData {
@@ -6,7 +6,7 @@ interface ButtonData {
   link: string;
 }
 
-function Footer(): React.ReactElement {
+function Footer(): ReactElement {
   const children: ButtonData[] = [
     { text: "Meta", link: "https://about.meta.com" },
     { text: "About", link: "https://about.instagram.com" },
@@ -29,11 +29,11 @@ function Footer(): React.ReactElement {
     },
   ];
 
-  const buttons: React.ReactNode[] = [];
+  const buttons: ReactElement[] = [];
 
   for (let i: number = 0; i < children.length; i++) {
     const data: ButtonData = children[i];
-    const button: React.ReactNode = (
+    const button: ReactElement = (
       <Button
         key={i}
         colorScheme="link"

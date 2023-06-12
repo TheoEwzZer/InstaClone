@@ -1,8 +1,8 @@
 import { ChakraProvider } from "@chakra-ui/react";
-import React from "react";
+import { ReactElement } from "react";
 import Register from "./components/register";
 
-function RegisterPage(): React.ReactElement {
+function RegisterPage(): ReactElement {
   return (
     <ChakraProvider>
       <Register />
