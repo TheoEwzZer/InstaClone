@@ -5,6 +5,7 @@ This file contains the API endpoints for the instaclone application.
 import re
 from typing import Any, Dict, List, Tuple
 
+import bcrypt
 from app.config.db import get_db
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -67,12 +68,18 @@ async def register_user(user: Dict[str, str]) -> None:
     cursor: Any | MySQLCursor = db.cursor()
     mobile: str | None = user["mobile"] or None
     email: str | None = user["email"] or None
-    params: Tuple[str | None, str | None, str, str, str, str] = (
+
+    password: str = user["password"]
+    password_bytes: bytes = password.encode(encoding="utf-8")
+    salt: bytes = bcrypt.gensalt()
+    hashed_password: bytes = bcrypt.hashpw(password=password_bytes, salt=salt)
+
+    params: Tuple[str | None, str | None, str, str, bytes, str] = (
         mobile,
         email,
         user["fullName"],
         user["username"],
-        user["password"],
+        hashed_password,
         user["birthday"]
     )
     operation = "INSERT INTO user (mobile, email, fullName, username, password, birthday) VALUES (%s, %s, %s, %s, %s, %s)"
@@ -82,23 +89,28 @@ async def register_user(user: Dict[str, str]) -> None:
 
 @app.post(path="/login", tags=["users"], status_code=200)
 async def login_user(user: Dict[str, str]) -> None:
+    error_message = "Sorry, your password was incorrect. Please double-check your password."
     cursor: Any | MySQLCursor = db.cursor()
     if user["email"]:
         cursor.execute(
-            operation="SELECT * FROM user WHERE email = %s AND password = %s", params=(user["email"], user["password"])
+            operation="SELECT * FROM user WHERE email = %s", params=(user["email"],)
         )
     if user["mobile"]:
         cursor.execute(
-            operation="SELECT * FROM user WHERE mobile = %s AND password = %s", params=(user["mobile"], user["password"])
+            operation="SELECT * FROM user WHERE mobile = %s", params=(user["mobile"],)
         )
     if user["username"]:
         cursor.execute(
-            operation="SELECT * FROM user WHERE username = %s AND password = %s", params=(user["username"], user["password"])
+            operation="SELECT * FROM user WHERE username = %s", params=(user["username"],)
         )
-    if not cursor.fetchone():
-        error_message = "Sorry, your password was incorrect. Please double-check your password."
-        raise HTTPException(
-            status_code=404, detail=error_message)
+    result: Any | Tuple[str | bytes | None, ...] | None = cursor.fetchone()
+    if result is None:
+        raise HTTPException(status_code=404, detail=error_message)
+    hashed_password_first: str = str(object=result[5])
+    hashed_password: bytes = hashed_password_first.encode(encoding="utf-8")
+    password: bytes = user["password"].encode(encoding="utf-8")
+    if not bcrypt.checkpw(password=password, hashed_password=hashed_password):
+        raise HTTPException(status_code=404, detail=error_message)
 
 
 @app.delete(path="/users/delete/email/{email}", tags=["users"], status_code=200)
