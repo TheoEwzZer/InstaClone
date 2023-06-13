@@ -87,12 +87,7 @@ function Register(): ReactElement {
     });
     const data: any = await response.json();
     if (response.status !== 200) {
-      email = "";
-      mobile = "";
       setErrorMessage(data.detail);
-      setMobileOrEmail("");
-      setPassword("");
-      setUsername("");
       return;
     }
     setErrorMessage("");
@@ -131,13 +126,7 @@ function Register(): ReactElement {
     });
     const data: any = await response.json();
     if (response.status !== 201) {
-      email = "";
-      mobile = "";
       setErrorMessage(data.detail);
-      setMobileOrEmail("");
-      setPassword("");
-      setUsername("");
-      setBirthday("");
       return;
     }
     email = "";

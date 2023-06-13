@@ -81,12 +81,7 @@ function Login(): ReactElement {
     });
     const data: any = await response.json();
     if (response.status !== 200) {
-      email = "";
-      mobile = "";
-      username = "";
       setErrorMessage(data.detail);
-      setMobileOrEmailOrUsername("");
-      setPassword("");
       return;
     }
     email = "";
