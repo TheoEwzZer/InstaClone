@@ -280,9 +280,11 @@ function Register(): ReactElement {
                 >
                   Next
                 </Button>
-                <Text textAlign="center" color="red.500">
-                  {errorMessage}
-                </Text>
+                {errorMessage && (
+                  <Text textAlign="center" color="red.500">
+                    {errorMessage}
+                  </Text>
+                )}
               </Stack>
             </Stack>
           </Box>
@@ -380,9 +382,11 @@ function Register(): ReactElement {
                 >
                   Go Back
                 </Button>
-                <Text textAlign="center" color="red.500">
-                  {errorMessage}
-                </Text>
+                {errorMessage && (
+                  <Text textAlign="center" color="red.500">
+                    {errorMessage}
+                  </Text>
+                )}
               </Stack>
             </Stack>
           </Box>

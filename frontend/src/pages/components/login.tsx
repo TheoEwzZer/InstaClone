@@ -181,9 +181,11 @@ function Login(): ReactElement {
               <Button colorScheme="link" color="rgb(56, 81, 133)">
                 Log in with Facebook
               </Button>
-              <Text textAlign="center" color="red.500">
-                {errorMessage}
-              </Text>
+              {errorMessage && (
+                <Text textAlign="center" color="red.500">
+                  {errorMessage}
+                </Text>
+              )}
               <Button colorScheme="link" color="rgb(0, 55, 107)" size="sm">
                 Forgot password?
               </Button>
