@@ -65,9 +65,9 @@ async def check_register_user(user: Dict[str, str]) -> None:
 @app.post(path="/register", tags=["users"], status_code=201)
 async def register_user(user: Dict[str, str]) -> None:
     cursor: MySQLCursor = db.cursor()
-    mobile = user["mobile"] or None
-    email = user["email"] or None
-    params: Tuple[str, str, str, str, str, str] = (
+    mobile: str | None = user["mobile"] or None
+    email: str | None = user["email"] or None
+    params: Tuple[str | None, str | None, str, str, str, str] = (
         mobile,
         email,
         user["fullName"],
@@ -102,7 +102,7 @@ async def login_user(user: Dict[str, str]) -> None:
 
 
 @app.delete(path="/users/delete/email/{email}", tags=["users"], status_code=200)
-async def delete_user_by_email(email: str) -> dict[str, str]:
+async def delete_user_by_email(email: str) -> Dict[str, str]:
     cursor: MySQLCursor = db.cursor()
     cursor.execute(
         operation="DELETE FROM user WHERE email = %s", params=(email,)
