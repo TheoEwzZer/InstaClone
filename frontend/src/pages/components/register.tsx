@@ -122,6 +122,8 @@ function Register(): ReactElement {
       setErrorMessage(data.detail);
       return;
     }
+    localStorage.setItem("jwtToken", data.token);
+    window.location.href = "/";
     email = "";
     mobile = "";
     setErrorMessage("");
@@ -129,7 +131,6 @@ function Register(): ReactElement {
     setPassword("");
     setUsername("");
     setBirthday("");
-    setStep(2);
   };
 
   if (step === 1) {

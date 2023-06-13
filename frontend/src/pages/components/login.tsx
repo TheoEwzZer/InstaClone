@@ -82,6 +82,8 @@ function Login(): ReactElement {
       setErrorMessage(data.detail);
       return;
     }
+    localStorage.setItem("jwtToken", data.token);
+    window.location.reload();
     email = "";
     mobile = "";
     username = "";
