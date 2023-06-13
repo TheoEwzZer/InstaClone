@@ -33,7 +33,7 @@ async def check_register_user(user: Dict[str, str]) -> None:
     if (not user["email"]) and (not user["mobile"]):
         raise HTTPException(
             status_code=400, detail="Email or Mobile is required.")
-    cursor: MySQLCursor = db.cursor()
+    cursor: Any | MySQLCursor = db.cursor()
     if user["email"]:
         if not validate_email(email=user["email"]):
             raise HTTPException(
@@ -64,7 +64,7 @@ async def check_register_user(user: Dict[str, str]) -> None:
 
 @app.post(path="/register", tags=["users"], status_code=201)
 async def register_user(user: Dict[str, str]) -> None:
-    cursor: MySQLCursor = db.cursor()
+    cursor: Any | MySQLCursor = db.cursor()
     mobile: str | None = user["mobile"] or None
     email: str | None = user["email"] or None
     params: Tuple[str | None, str | None, str, str, str, str] = (
@@ -82,7 +82,7 @@ async def register_user(user: Dict[str, str]) -> None:
 
 @app.post(path="/login", tags=["users"], status_code=200)
 async def login_user(user: Dict[str, str]) -> None:
-    cursor: MySQLCursor = db.cursor()
+    cursor: Any | MySQLCursor = db.cursor()
     if user["email"]:
         cursor.execute(
             operation="SELECT * FROM user WHERE email = %s AND password = %s", params=(user["email"], user["password"])
@@ -103,7 +103,7 @@ async def login_user(user: Dict[str, str]) -> None:
 
 @app.delete(path="/users/delete/email/{email}", tags=["users"], status_code=200)
 async def delete_user_by_email(email: str) -> Dict[str, str]:
-    cursor: MySQLCursor = db.cursor()
+    cursor: Any | MySQLCursor = db.cursor()
     cursor.execute(
         operation="DELETE FROM user WHERE email = %s", params=(email,)
     )
