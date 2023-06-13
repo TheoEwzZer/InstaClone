@@ -99,3 +99,16 @@ async def login_user(user: Dict[str, str]) -> None:
         error_message = "Sorry, your password was incorrect. Please double-check your password."
         raise HTTPException(
             status_code=404, detail=error_message)
+
+
+@app.delete(path="/users/delete/email/{email}", tags=["users"], status_code=200)
+async def delete_user_by_email(email: str) -> dict[str, str]:
+    cursor: MySQLCursor = db.cursor()
+    cursor.execute(
+        operation="DELETE FROM user WHERE email = %s", params=(email,)
+    )
+    if not cursor.rowcount:
+        raise HTTPException(
+            status_code=404, detail="Not found")
+    db.commit()
+    return {"message": f"Successfully deleted user with email {email}."}
