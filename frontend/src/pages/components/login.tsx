@@ -4,16 +4,16 @@ import {
   Box,
   Button,
   Container,
+  Divider,
   FormControl,
   HStack,
-  Text,
   Image,
   Input,
-  Stack,
-  useDisclosure,
   InputGroup,
   InputRightElement,
-  Divider,
+  Stack,
+  Text,
+  useDisclosure,
 } from "@chakra-ui/react";
 import Footer from "./footer";
 
@@ -33,6 +33,7 @@ function isPhoneNumberOrEmailOrUsername(input: string): string {
 function Login(): ReactElement {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isInputEmpty, setIsInputEmpty] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [mobileOrEmailOrUsername, setMobileOrEmailOrUsername] =
     useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -63,22 +64,19 @@ function Login(): ReactElement {
     } else {
       username = mobileOrEmailOrUsername;
     }
-    if (!password || !mobileOrEmailOrUsername) {
-      setErrorMessage("Please fill in all fields");
-      return;
-    }
     const User = {
       email: email,
       mobile: mobile,
       password: password,
       username: username,
     };
-    console.log(User);
+    setIsLoading(true);
     const response = await fetch("http://localhost:8000/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(User),
     });
+    setIsLoading(false);
     const data: any = await response.json();
     if (response.status !== 200) {
       setErrorMessage(data.detail);
@@ -168,6 +166,8 @@ function Login(): ReactElement {
                 colorScheme="blue"
                 backgroundColor="rgb(0, 149, 246)"
                 onClick={handleLogin}
+                isDisabled={isLoading || !password || !mobileOrEmailOrUsername}
+                {...(isLoading ? { isLoading: true } : {})}
               >
                 Log in
               </Button>

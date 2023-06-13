@@ -35,6 +35,7 @@ function Register(): ReactElement {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [fullName, setFullName] = useState<string>("");
   const [isInputEmpty, setIsInputEmpty] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [mobileOrEmail, setMobileOrEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [username, setUsername] = useState<string>("");
@@ -65,14 +66,6 @@ function Register(): ReactElement {
     } else {
       mobile = mobileOrEmail;
     }
-    if (password.length < 6) {
-      setErrorMessage("Password must be at least 6 characters");
-      return;
-    }
-    if (!password || !username || inputType === "invalid") {
-      setErrorMessage("Please fill in all fields");
-      return;
-    }
     const newUser = {
       email: email,
       fullName: fullName,
@@ -80,11 +73,13 @@ function Register(): ReactElement {
       password: password,
       username: username,
     };
+    setIsLoading(true);
     const response = await fetch("http://localhost:8000/checkregister", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newUser),
     });
+    setIsLoading(false);
     const data: any = await response.json();
     if (response.status !== 200) {
       setErrorMessage(data.detail);
@@ -107,10 +102,6 @@ function Register(): ReactElement {
     } else {
       mobile = mobileOrEmail;
     }
-    if (new Date(birthday) > new Date()) {
-      setErrorMessage("Please enter a valid date");
-      return;
-    }
     const newUser = {
       email: email,
       fullName: fullName,
@@ -119,11 +110,13 @@ function Register(): ReactElement {
       username: username,
       birthday: new Date(birthday).toISOString().slice(0, 10),
     };
+    setIsLoading(true);
     const response = await fetch("http://localhost:8000/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newUser),
     });
+    setIsLoading(false);
     const data: any = await response.json();
     if (response.status !== 201) {
       setErrorMessage(data.detail);
@@ -275,6 +268,15 @@ function Register(): ReactElement {
                   colorScheme="blue"
                   size="lg"
                   onClick={handleCheckRegister}
+                  isDisabled={
+                    !fullName ||
+                    !mobileOrEmail ||
+                    !password ||
+                    !username ||
+                    isLoading ||
+                    password.length < 6
+                  }
+                  {...(isLoading ? { isLoading: true } : {})}
                 >
                   Next
                 </Button>
@@ -359,10 +361,23 @@ function Register(): ReactElement {
                   Use your own birthday, even if this account is for a business,
                   a pet, or something else
                 </Text>
-                <Button colorScheme="blue" size="lg" onClick={handleRegister}>
+                <Button
+                  colorScheme="blue"
+                  size="lg"
+                  onClick={handleRegister}
+                  isDisabled={
+                    !birthday || isLoading || new Date(birthday) >= new Date()
+                  }
+                  {...(isLoading ? { isLoading: true } : {})}
+                >
                   Next
                 </Button>
-                <Button colorScheme="blue" size="lg" onClick={handleBack}>
+                <Button
+                  colorScheme="blue"
+                  size="lg"
+                  variant="ghost"
+                  onClick={handleBack}
+                >
                   Go Back
                 </Button>
                 <Text textAlign="center" color="red.500">
