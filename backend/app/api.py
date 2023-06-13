@@ -7,12 +7,14 @@ from typing import Any, Dict, List, Tuple
 
 import bcrypt
 from app.config.db import get_db
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from mysql.connector.connection import MySQLConnection
 from mysql.connector.cursor import MySQLCursor
 from mysql.connector.pooling import PooledMySQLConnection
 from validate_email import validate_email
+
+from app.auth.auth import decode_jwt, encode_jwt
 
 app = FastAPI()
 
@@ -64,7 +66,7 @@ async def check_register_user(user: Dict[str, str]) -> None:
 
 
 @app.post(path="/register", tags=["users"], status_code=201)
-async def register_user(user: Dict[str, str]) -> None:
+async def register_user(user: Dict[str, str]) -> Dict[str, str]:
     cursor: Any | MySQLCursor = db.cursor()
     mobile: str | None = user["mobile"] or None
     email: str | None = user["email"] or None
@@ -85,10 +87,11 @@ async def register_user(user: Dict[str, str]) -> None:
     operation = "INSERT INTO user (mobile, email, fullName, username, password, birthday) VALUES (%s, %s, %s, %s, %s, %s)"
     cursor.execute(operation, params)
     db.commit()
+    return encode_jwt(username=user["username"])
 
 
 @app.post(path="/login", tags=["users"], status_code=200)
-async def login_user(user: Dict[str, str]) -> None:
+async def login_user(user: Dict[str, str]) -> Dict[str, str]:
     error_message = "Sorry, your password was incorrect. Please double-check your password."
     cursor: Any | MySQLCursor = db.cursor()
     if user["email"]:
@@ -111,6 +114,7 @@ async def login_user(user: Dict[str, str]) -> None:
     password: bytes = user["password"].encode(encoding="utf-8")
     if not bcrypt.checkpw(password=password, hashed_password=hashed_password):
         raise HTTPException(status_code=404, detail=error_message)
+    return encode_jwt(username=user["username"])
 
 
 @app.delete(path="/users/delete/email/{email}", tags=["users"], status_code=200)
@@ -124,3 +128,8 @@ async def delete_user_by_email(email: str) -> Dict[str, str]:
             status_code=404, detail="Not found")
     db.commit()
     return {"message": f"Successfully deleted user with email {email}."}
+
+
+@app.get(path="/check_token", tags=["users"], status_code=200, dependencies=[Depends(dependency=decode_jwt)])
+async def check_token() -> Dict[str, str]:
+    return {"message": "Token is valid"}
