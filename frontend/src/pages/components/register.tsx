@@ -15,8 +15,6 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import Footer from "./footer";
 
 function isPhoneNumberOrEmail(input: string): string {
@@ -41,15 +39,7 @@ function Register(): ReactElement {
   const [password, setPassword] = useState<string>("");
   const [username, setUsername] = useState<string>("");
   const { isOpen, onToggle } = useDisclosure();
-  const [birthday, setBirthday] = useState<Date>(new Date());
-
-  const handleDateChange: (date: Date | null) => void = (
-    date: Date | null
-  ): void => {
-    if (date) {
-      setBirthday(date);
-    }
-  };
+  const [birthday, setBirthday] = useState<string>("");
 
   const onClickReveal: () => void = (): void => {
     onToggle();
@@ -122,7 +112,7 @@ function Register(): ReactElement {
     } else {
       mobile = mobileOrEmail;
     }
-    if (birthday > new Date()) {
+    if (new Date(birthday) > new Date()) {
       setErrorMessage("Please enter a valid date");
       return;
     }
@@ -132,7 +122,7 @@ function Register(): ReactElement {
       mobile: mobile,
       password: password,
       username: username,
-      birthday: birthday.toISOString().slice(0, 10),
+      birthday: new Date(birthday).toISOString().slice(0, 10),
     };
     const response = await fetch("http://localhost:8000/register", {
       method: "POST",
@@ -147,7 +137,7 @@ function Register(): ReactElement {
       setMobileOrEmail("");
       setPassword("");
       setUsername("");
-      setBirthday(new Date());
+      setBirthday("");
       return;
     }
     email = "";
@@ -156,7 +146,7 @@ function Register(): ReactElement {
     setMobileOrEmail("");
     setPassword("");
     setUsername("");
-    setBirthday(new Date());
+    setBirthday("");
     setStep(2);
   };
 
@@ -355,12 +345,14 @@ function Register(): ReactElement {
               >
                 This won't be a part of your public profile.
               </Heading>
-              <DatePicker
-                selected={birthday}
-                onChange={handleDateChange}
-                showMonthDropdown
-                showYearDropdown
-                dropdownMode="select"
+              <Input
+                type="date"
+                onChange={(event: ChangeEvent<HTMLInputElement>): void =>
+                  setBirthday(event.target.value)
+                }
+                aria-label="Birthday"
+                aria-required="true"
+                value={birthday}
               />
               <Stack spacing="6">
                 <Text
